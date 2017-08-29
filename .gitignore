@@ -1,2 +1,5 @@
 *.iml
 .idea
+wdir
+data
+docker/**/model
