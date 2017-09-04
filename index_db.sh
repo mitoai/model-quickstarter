@@ -200,8 +200,8 @@ if [ "$blacklist" != "false" ]; then
   grep -v -f $blacklist $WDIR/uriCounts_all > $WDIR/uriCounts
 fi
 
-echo "Finished wikistats extraction. Cleaning up..."
-rm -f $WDIR/dump.xml
+#echo "Finished wikistats extraction. Cleaning up..."
+#rm -f $WDIR/dump.xml
 
 
 ########################################################################################################
