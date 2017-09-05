@@ -1,7 +1,10 @@
 #!/bin/bash
 
 echo "Cleaning up since last run ..."
-rm -r -v wdir
+rm -r -v wdir/en_US
+rm -r -v wdir/no_NO
+rm -r -v wdir/da_DK
+rm -r -v wdir/sv_SE
 rm -r -v data
 rm -r -v docker/models
 mkdir -v data
