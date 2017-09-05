@@ -169,13 +169,13 @@ if [ -d dbpedia-spotlight ]; then
     cd dbpedia-spotlight
     git reset --hard HEAD
     git pull
-    mvn -T 1C -q clean install
+    mvn install
 else
     echo "Setting up DBpedia Spotlight..."
     git clone --depth 1 https://github.com/dbpedia-spotlight/dbpedia-spotlight-model
     mv dbpedia-spotlight-model dbpedia-spotlight
     cd dbpedia-spotlight
-    mvn -T 1C -q clean install
+    mvn install
 fi
 
 
@@ -183,14 +183,16 @@ fi
 # Extracting wiki stats:
 ########################################################################################################
 
-cd $BASE_WDIR
-rm -Rf wikistatsextractor
-git clone --depth 1 https://github.com/dbpedia-spotlight/wikistatsextractor
+if [ -d wikistatsextractor ]; then
+    echo "Wikistatsextractor already present"
+else
+    cd $BASE_WDIR
+    git clone --depth 1 https://github.com/dbpedia-spotlight/wikistatsextractor
+fi
 
 # Stop processing if one step fails
 set -e
 
-#Copy results to local:
 cd $BASE_WDIR/wikistatsextractor
 mvn install exec:java -Dexec.args="--output_folder $WDIR $LANGUAGE $2 $4Stemmer $WDIR/dump.xml $WDIR/stopwords.$LANGUAGE.list"
 
@@ -200,15 +202,11 @@ if [ "$blacklist" != "false" ]; then
   grep -v -f $blacklist $WDIR/uriCounts_all > $WDIR/uriCounts
 fi
 
-#echo "Finished wikistats extraction. Cleaning up..."
-#rm -f $WDIR/dump.xml
-
-
 ########################################################################################################
 # Building Spotlight model:
 ########################################################################################################
 
-#Create the model:
+# Create the model:
 cd $BASE_WDIR/dbpedia-spotlight
 
 mvn -pl index exec:java -Dexec.mainClass=org.dbpedia.spotlight.db.CreateSpotlightModel -Dexec.args="$2 $WDIR $TARGET_DIR $opennlp $STOPWORDS $4Stemmer"
