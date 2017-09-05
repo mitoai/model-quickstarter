@@ -73,7 +73,56 @@ echo "Working directory: $WDIR"
 mkdir -p $WDIR
 
 ########################################################################################################
-# Preparing the data.
+# Setup DBpedia extraction:
+########################################################################################################
+
+cd $BASE_WDIR
+
+if [ -d extraction-framework ]; then
+    echo "Extraction framework already present ..."
+else
+    echo "Setting up Extraction framework ..."
+    git clone git://github.com/dbpedia/extraction-framework.git
+fi
+
+cd extraction-framework
+mvn install
+
+########################################################################################################
+# Setup Spotlight:
+########################################################################################################
+
+cd $BASE_WDIR
+
+if [ -d dbpedia-spotlight ]; then
+    echo "DBpedia Spotlight already present ..."
+else
+    echo "Setting up DBpedia Spotlight ..."
+    git clone https://github.com/dbpedia-spotlight/dbpedia-spotlight-model
+    mv dbpedia-spotlight-model dbpedia-spotlight
+fi
+
+cd dbpedia-spotlight
+mvn install
+
+########################################################################################################
+# Setup Extracting wiki stats:
+########################################################################################################
+
+cd $BASE_WDIR
+
+if [ -d wikistatsextractor ]; then
+    echo "Wikistats Extractor already present"
+else
+    echo "Setting up Wikistats Extractor ..."
+    git clone https://github.com/dbpedia-spotlight/wikistatsextractor
+fi
+
+cd wikistatsextractor
+mvn install
+
+########################################################################################################
+# Download Wikipedia dump:
 ########################################################################################################
 
 echo "Loading Wikipedia dump..."
@@ -103,29 +152,11 @@ else
   touch "$LANGUAGE.tokenizer_model"
 fi
 
-
 ########################################################################################################
 # DBpedia extraction:
 ########################################################################################################
 
-#Download:
-echo "Creating DBpedia nt files..."
-cd $BASE_WDIR
-
-if [ -d extraction-framework ]; then
-    echo "Updating DBpedia Spotlight..."
-    cd extraction-framework
-    git reset --hard HEAD
-    git pull
-    mvn install
-else
-    echo "Setting up DEF..."
-    git clone git://github.com/dbpedia/extraction-framework.git
-    cd extraction-framework
-    mvn install
-fi
-
-cd dump
+cd $BASE_WDIR/dbpedia-spotlight/dump
 
 dumpdate=$(date +%Y%m%d)
 dumpdir=$WDIR/${LANGUAGE}wiki/${dumpdate}
@@ -159,42 +190,13 @@ zcat $dumpdir/${LANGUAGE}wiki-${dumpdate}-redirects.nt.gz > $WDIR/redirects.nt
 rm -Rf $dumpdir
 
 ########################################################################################################
-# Setting up Spotlight:
-########################################################################################################
-
-cd $BASE_WDIR
-
-if [ -d dbpedia-spotlight ]; then
-    echo "Updating DBpedia Spotlight..."
-    cd dbpedia-spotlight
-    git reset --hard HEAD
-    git pull
-    mvn install
-else
-    echo "Setting up DBpedia Spotlight..."
-    git clone --depth 1 https://github.com/dbpedia-spotlight/dbpedia-spotlight-model
-    mv dbpedia-spotlight-model dbpedia-spotlight
-    cd dbpedia-spotlight
-    mvn install
-fi
-
-
-########################################################################################################
 # Extracting wiki stats:
 ########################################################################################################
 
-if [ -d wikistatsextractor ]; then
-    echo "Wikistatsextractor already present"
-else
-    cd $BASE_WDIR
-    git clone --depth 1 https://github.com/dbpedia-spotlight/wikistatsextractor
-fi
-
+cd $BASE_WDIR/wikistatsextractor
 # Stop processing if one step fails
 set -e
-
-cd $BASE_WDIR/wikistatsextractor
-mvn install exec:java -Dexec.args="--output_folder $WDIR $LANGUAGE $2 $4Stemmer $WDIR/dump.xml $WDIR/stopwords.$LANGUAGE.list"
+mvn exec:java -Dexec.args="--output_folder $WDIR $LANGUAGE $2 $4Stemmer $WDIR/dump.xml $WDIR/stopwords.$LANGUAGE.list"
 
 if [ "$blacklist" != "false" ]; then
   echo "Removing blacklist URLs..."
@@ -217,7 +219,6 @@ fi
 
 curl https://raw.githubusercontent.com/dbpedia-spotlight/model-quickstarter/master/model_readme.txt > $TARGET_DIR/README.txt
 curl "$WIKI_MIRROR/${LANGUAGE}wiki/latest/${LANGUAGE}wiki-latest-pages-articles.xml.bz2-rss.xml" | grep link | sed -e 's/^.*<link>//' -e 's/<[/]link>.*$//' | uniq >> $TARGET_DIR/README.txt
-
 
 echo "Collecting data..."
 cd $BASE_DIR
