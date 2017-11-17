@@ -9,7 +9,7 @@ RUN mkdir -p /opt/spotlight && \
 
 RUN touch spotlight.sh && \
     chmod +x spotlight.sh && \
-    echo "java -Dfile.encoding=UTF-8 -Xmx20G -jar /opt/spotlight/dbpedia-spotlight-1.0.0.jar /opt/spotlight  http://0.0.0.0:80/rest" >> spotlight.sh
+    echo "java -Dfile.encoding=UTF-8 -Xmx8G -jar /opt/spotlight/dbpedia-spotlight-1.0.0.jar /opt/spotlight  http://0.0.0.0:80/rest" >> spotlight.sh
 
 ADD model /opt/spotlight/
 
