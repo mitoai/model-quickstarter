@@ -156,7 +156,7 @@ fi
 # DBpedia extraction:
 ########################################################################################################
 
-cd $BASE_WDIR/dbpedia-spotlight/dump
+cd $BASE_WDIR/extraction-framework/dump
 
 dumpdate=$(date +%Y%m%d)
 dumpdir=$WDIR/${LANGUAGE}wiki/${dumpdate}
