@@ -126,16 +126,21 @@ mvn install
 ########################################################################################################
 
 echo "Loading Wikipedia dump..."
+if [ -z "$WIKI_MIRROR" ]; then
+  WIKI_MIRROR="https://dumps.wikimedia.org/"
+fi
+
 WP_DOWNLOAD_FILE=$WDIR/dump.xml
-echo "Checking for wikipedia dump at $WP_DOWNLOAD_FILE ..."
+echo Checking for wikipedia dump at $WP_DOWNLOAD_FILE
 if [ -f "$WP_DOWNLOAD_FILE" ]; then
   echo File exists.
 else
   echo Downloading wikipedia dump.
-  dumpDate="20181201"
-  dumpName="${LANGUAGE}wiki-${dumpDate}-pages-articles.xml.bz2"
-  gsutil cp "gs://indexing/raw/wikipedia/$dumpName" .
-  bzcat $dumpName > $WDIR/dump.xml
+    curl -# "$WIKI_MIRROR/${LANGUAGE}wiki/latest/${LANGUAGE}wiki-latest-pages-articles.xml.bz2" | bzcat > $WDIR/dump.xml
+  if [ "$eval" == "false" ]; then
+  else
+    curl -# "$WIKI_MIRROR/${LANGUAGE}wiki/latest/${LANGUAGE}wiki-latest-pages-articles.xml.bz2" | bzcat | python $BASE_DIR/scripts/split_train_test.py 1200 $WDIR/heldout.txt > $WDIR/dump.xml
+  fi
 fi
 
 cd $WDIR
