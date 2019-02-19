@@ -3,3 +3,4 @@
 wdir
 data
 /docker/**/model/
+docker/models
