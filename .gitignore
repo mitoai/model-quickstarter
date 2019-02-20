@@ -3,3 +3,5 @@
 wdir
 data
 /docker/**/model/
+*pages-articles.xml*
+dumps/*
