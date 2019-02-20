@@ -8,7 +8,7 @@ ARG BASE_WDIR=/opt/spotlight/wdir
 ARG WDIR=$BASE_WDIR/$WIKI_LOCALE
 ARG TARGET_DIR="$WDIR/${WIKI_LANGUAGE}/model"
 ARG WIKI_MIRROR="https://dumps.wikimedia.org"
-ARG WIKI_DUMP_DATE="20181201"
+ARG WIKI_DUMP_DATE="20190201"
 ARG OPENNLP="None"
 
 RUN mkdir -p $WDIR
@@ -16,8 +16,10 @@ WORKDIR /opt/spotlight
 
 # Download Wikipedia dump:
 RUN echo "Loading Wikipedia dump..."
-RUN curl -# "$WIKI_MIRROR/${WIKI_LANGUAGE}wiki/latest/${WIKI_LANGUAGE}wiki-latest-pages-articles.xml.bz2" | bzcat > $WDIR/dump.xml
-RUN wget -O $WDIR/page_props.sql.gz "$WIKI_MIRROR/${WIKI_LANGUAGE}wiki/latest/${WIKI_LANGUAGE}wiki-latest-page_props.sql.gz"
+ARG dump=$WIKI_MIRROR/${WIKI_LANGUAGE}wiki/${WIKI_DUMP_DATE}/${WIKI_LANGUAGE}wiki-${WIKI_DUMP_DATE}-pages-articles.xml.bz2
+RUN echo Downloading $dump ....
+RUN curl -# "$dump" | bzcat > $WDIR/dump.xml
+RUN wget -O $WDIR/page_props.sql.gz "$WIKI_MIRROR/${WIKI_LANGUAGE}wiki/${WIKI_DUMP_DATE}/${WIKI_LANGUAGE}wiki-${WIKI_DUMP_DATE}-page_props.sql.gz"
 ADD $WIKI_LANGUAGE $WDIR/$WIKI_LANGUAGE
 RUN (cd $WDIR && cp $WDIR/$WIKI_LANGUAGE/stopwords.list stopwords.$WIKI_LANGUAGE.list && touch "$WIKI_LANGUAGE.tokenizer_model")
 
@@ -65,7 +67,7 @@ RUN mvn -pl index exec:java \
   -Dexec.args="$WIKI_LOCALE $WDIR $TARGET_DIR $OPENNLP $WDIR/${WIKI_LANGUAGE}/stopwords.list ${WIKI_LANGUAGE_NAME}Stemmer"
 
 RUN curl https://raw.githubusercontent.com/dbpedia-spotlight/model-quickstarter/master/model_readme.txt > $TARGET_DIR/README.txt
-RUN curl "$WIKI_MIRROR/${WIKI_LANGUAGE}wiki/latest/${WIKI_LANGUAGE}wiki-latest-pages-articles.xml.bz2-rss.xml" \
+RUN curl "$WIKI_MIRROR/${WIKI_LANGUAGE}wiki/${WIKI_DUMP_DATE}/${WIKI_LANGUAGE}wiki-${WIKI_DUMP_DATE}-pages-articles.xml.bz2-rss.xml" \
   | grep link \
   | sed -e 's/^.*<link>//' -e 's/<[/]link>.*$//' \
   | uniq >> $TARGET_DIR/README.txt

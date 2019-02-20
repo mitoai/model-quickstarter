@@ -25,13 +25,14 @@ docker build \
   --build-arg WIKI_LANGUAGE=${WIKI_LANGUAGE} \
   --build-arg WIKI_LOCALE=${WIKI_LOCALE} \
   --build-arg WIKI_LANGUAGE_NAME=${WIKI_LANGUAGE_NAME} \
+  --build-arg WIKI_DUMP_DATE=${WIKI_DUMP_DATE} \
   --tag eu.gcr.io/ntnu-smartmedia/spotlight-base-model-${WIKI_LANGUAGE} \
   -f docker/base-model/Dockerfile .
 ```
 alternatively
 
 ```
-./create_model.sh no Norwegian no_NO
+./create_model.sh no Norwegian no_NO 20190201
 ```
 
 ### Server
@@ -68,5 +69,5 @@ alternatively
 ### Complete setup 
 Alternatively, run everything in one go
 ```
-./complete.sh no Norwegian no_NO 3001 4g
+./complete.sh no Norwegian no_NO 3001 4g 20190201
 ```
