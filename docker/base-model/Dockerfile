@@ -18,8 +18,10 @@ WORKDIR /opt/spotlight
 RUN echo "Loading Wikipedia dump..."
 ARG dump=$WIKI_MIRROR/${WIKI_LANGUAGE}wiki/${WIKI_DUMP_DATE}/${WIKI_LANGUAGE}wiki-${WIKI_DUMP_DATE}-pages-articles.xml.bz2
 RUN echo Downloading $dump ....
-RUN curl -# "$dump" | bzcat > $WDIR/dump.xml
-RUN wget -O $WDIR/page_props.sql.gz "$WIKI_MIRROR/${WIKI_LANGUAGE}wiki/${WIKI_DUMP_DATE}/${WIKI_LANGUAGE}wiki-${WIKI_DUMP_DATE}-page_props.sql.gz"
+RUN wget $dump --progress=bar:force:noscroll -q --show-progress
+RUN bzcat ${WIKI_LANGUAGE}wiki-${WIKI_DUMP_DATE}-pages-articles.xml.bz2 > $WDIR/dump.xml
+RUN rm ${WIKI_LANGUAGE}wiki-${WIKI_DUMP_DATE}-pages-articles.xml.bz2
+RUN wget -O $WDIR/page_props.sql.gz "$WIKI_MIRROR/${WIKI_LANGUAGE}wiki/${WIKI_DUMP_DATE}/${WIKI_LANGUAGE}wiki-${WIKI_DUMP_DATE}-page_props.sql.gz" --progress=bar:force:noscroll -q --show-progress
 ADD $WIKI_LANGUAGE $WDIR/$WIKI_LANGUAGE
 RUN (cd $WDIR && cp $WDIR/$WIKI_LANGUAGE/stopwords.list stopwords.$WIKI_LANGUAGE.list && touch "$WIKI_LANGUAGE.tokenizer_model")
 
