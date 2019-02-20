@@ -1,8 +1,15 @@
-FROM eu.gcr.io/ntnu-smartmedia/spotlight-base-model-no:latest
+ARG WIKI_LANGUAGE
+
+FROM eu.gcr.io/ntnu-smartmedia/spotlight-base-model-$WIKI_LANGUAGE:latest
 
 EXPOSE 80
 
 ENV RELEASE_FILENAME="dbpedia-spotlight-1.0.0.jar"
+
+ENV WIKI_LANGUAGE=$WIKI_LANGUAGE
+ENV WIKI_LANGUAGE_NAME=
+ENV WIKI_LOCALE=
+ENV MEMORY=
 
 RUN mkdir -p /opt/spotlight \
 &&  cd /opt/spotlight \
@@ -11,8 +18,7 @@ RUN mkdir -p /opt/spotlight \
 WORKDIR /opt/spotlight
 
 ADD . .
+
 RUN chmod +x spotlight.sh
 
 ENTRYPOINT ["./spotlight.sh"]
-
-
