@@ -1,36 +1,8 @@
 #!/usr/bin/env bash
-
-echo "Starting English ..."
-docker rm -f spotlight-en
-docker pull mitoai/spotlight-en
-docker run -d --name spotlight-en -p 3001:80 e932f6bdf9b5
-
-echo "Starting Norwegian ..."
-docker rm -f spotlight-no
-docker pull mitoai/spotlight-no
-docker run -d --name spotlight-no -p 3002:80 0068eb345dc6
-
-echo "Starting Danish ..."
-docker rm -f spotlight-da
-docker pull mitoai/spotlight-da
-docker run -d --name spotlight-da -p 3003:80 4a45ccf1c866
-
-echo "Starting Swedish ..."
-docker rm -f spotlight-sv
-docker pull mitoai/spotlight-sv
-docker run -d --name spotlight-sv -p 3004:80 73a46e422617
-
-echo "Starting Spanish ..."
-docker rm -f spotlight-es
-docker pull mitoai/spotlight-es
-docker run -d --name spotlight-es -p 3005:80 9d4249d6c955
-
-echo "Starting German ..."
-docker rm -f spotlight-de
-docker pull mitoai/spotlight-de
-docker run -d --name spotlight-de -p 3006:80 3077fa83dd99
-
-echo "Starting French ..."
-docker rm -f spotlight-fr
-docker pull mitoai/spotlight-fr
-docker run -d --name spotlight-fr -p 3007:80 9e5983cc3f7c
+./start-server.sh no Norwegian no_NO 3001  8g
+./start-server.sh sv Swedish   sv_SE 3002  8g
+./start-server.sh en English   en_US 3003 26g
+./start-server.sh de German    de_DE 3004 12g
+./start-server.sh fr French    fr_FR 3005  8g
+./start-server.sh da Danish    da_DK 3006  8g
+./start-server.sh es Spanish   es_ES 3007 10g
